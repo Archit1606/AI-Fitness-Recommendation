@@ -5,6 +5,11 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
   security:
     oauth2:
       resourceserver:
@@ -31,6 +36,13 @@ spring:
               uri: lb://AI-SERVICE
               predicates:
                 - Path=/api/recommendations/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 100
+                    redis-rate-limiter.burstCapacity: 100
+                    redis-rate-limiter.requestedTokens: 1
+                    key-resolver: "#{@userKeyResolver}"
 
 server:
   port: 8089

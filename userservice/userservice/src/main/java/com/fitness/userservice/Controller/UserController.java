@@ -2,6 +2,7 @@ package com.fitness.userservice.Controller;
 
 import com.fitness.userservice.dto.RegisterRequest;
 import com.fitness.userservice.dto.UserResponse;
+import com.fitness.userservice.dto.UserPreferenceUpdateRequest;
 import com.fitness.userservice.services.UserServices;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,13 @@ public class UserController {
     @GetMapping("/{userId}/validate")
     public ResponseEntity<Boolean> validateUser(@PathVariable String userId){
         return ResponseEntity.ok(userServices.existByKeycloakId(userId));
+    }
+
+    @PutMapping("/{userId}/preferences")
+    public ResponseEntity<UserResponse> updatePreferences(
+            @PathVariable String userId,
+            @RequestBody UserPreferenceUpdateRequest request) {
+        return ResponseEntity.ok(userServices.updatePreferences(userId, request));
     }
 
 }

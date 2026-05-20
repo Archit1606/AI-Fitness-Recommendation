@@ -7,6 +7,13 @@ spring:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
 
 eureka:
   client:
@@ -18,3 +25,7 @@ eureka:
 
 server:
   port: 8081
+
+kafka:
+  topic:
+    cache-invalidation: cache-invalidation-events

@@ -1,4 +1,4 @@
-import { Card, CardContent, Grid2, Typography } from '@mui/material'
+import { Card, CardContent, Grid, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router';
 import { getActivities } from '../../services/api'; 
@@ -20,9 +20,9 @@ const ActivityList = () => {
     fetchActivities();
   }, []);
   return (
-    <Grid2 container spacing={2}>
+    <Grid container spacing={2}>
       {activities.map((activity) => (
-        <Grid2 container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             <Card sx={{cursor: 'pointer'}}
             onClick= {() => navigate(`/activities/${activity.id}`)}>
                 <CardContent>
@@ -31,9 +31,9 @@ const ActivityList = () => {
                   <Typography>Calories: {activity.caloriesBurned}</Typography>
                 </CardContent>
             </Card>
-        </Grid2>
+        </Grid>
       ))}
-  </Grid2>
+  </Grid>
   )
 }
 
