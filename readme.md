@@ -8,6 +8,8 @@ This platform provides a complete fitness solution with multiple specialized mic
 
 ## Architecture Diagram
 
+![Architecture diagram](architecture_diagram.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Client Browser                          │
