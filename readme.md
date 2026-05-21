@@ -26,6 +26,7 @@ This platform provides a complete fitness solution with multiple specialized mic
 - Java 17 or higher
 - Maven 3.6+
 - Node.js 16+ and npm
+- Redis (Docker recommended)
 - Docker (optional, for containerized deployment)
 
 ## Technologies
@@ -35,6 +36,7 @@ This platform provides a complete fitness solution with multiple specialized mic
 - Spring Cloud (Eureka, Config Server, Gateway)
 - Java 17
 - Maven
+- Redis (distributed cache)
 
 ### Frontend
 - React
@@ -107,6 +109,15 @@ cd "fitness microservice"
 ```
 
 ### 2. Start Services in Order
+
+#### Start Redis (Cache)
+
+```bash
+cd "fitness microservice"
+docker compose up -d redis
+```
+
+Redis: `localhost:6379`
 
 #### Start Eureka Server (Service Discovery)
 
@@ -182,6 +193,7 @@ Frontend: `http://localhost:5173`
 | Activity Service | Dynamic | Registered with Eureka |
 | AI Service | Dynamic | Registered with Eureka |
 | Frontend | 5173 | React Application (Vite) |
+| Redis | 6379 | Distributed cache |
 
 ## Development Workflow
 
@@ -248,6 +260,13 @@ The production build will be available in the `dist/` directory.
 ## Configuration
 
 Configuration files are managed centrally through the Config Server. Each service has its own `application.yml` in the `src/main/resources/` directory.
+
+### Redis Configuration
+
+Redis is used for recommendation caching and gateway rate limiting.
+
+- Host/port: `spring.data.redis.host`, `spring.data.redis.port`
+- Cache TTL: `cache.recommendation.ttl` (default 30 minutes)
 
 ### Example Configuration Structure
 
