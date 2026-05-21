@@ -2,12 +2,14 @@ package com.fitness.dietservice.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fitness.dietservice.cache.DietCacheService;
 import com.fitness.dietservice.dto.DietRecommendationRequest;
 import com.fitness.dietservice.dto.DietRecommendationResponse;
 import com.fitness.dietservice.model.DietPlan;
 import com.fitness.dietservice.model.DietRecommendation;
 import com.fitness.dietservice.repository.DietRecommendationRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,12 @@ public class DietRecommendationService {
     private final DietRecommendationRepository repository;
     private final DietPromptBuilder promptBuilder;
     private final GeminiService geminiService;
+    private final DietCacheService cacheService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public DietRecommendationResponse generateRecommendation(String userId, DietRecommendationRequest request) {
+        cacheService.evictLatest(userId);
         String prompt = promptBuilder.buildPrompt(userId, request);
         String aiResponse = geminiService.getDietPlan(prompt);
         DietPlan plan = parseDietPlan(aiResponse);
@@ -43,13 +47,29 @@ public class DietRecommendationService {
 
         DietRecommendation saved = repository.save(recommendation);
         log.info("Diet recommendation created for user {}", userId);
-        return mapToResponse(saved);
+        DietRecommendationResponse response = mapToResponse(saved);
+        cacheService.putLatest(userId, response);
+        return response;
     }
 
     public List<DietRecommendationResponse> getUserRecommendations(String userId) {
         return repository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    public Optional<DietRecommendationResponse> getLatestRecommendation(String userId) {
+        Optional<DietRecommendationResponse> cached = cacheService.getLatest(userId);
+        if (cached.isPresent()) {
+            return cached;
+        }
+
+        return repository.findTopByUserIdOrderByCreatedAtDesc(userId)
+                .map(this::mapToResponse)
+                .map(response -> {
+                    cacheService.putLatest(userId, response);
+                    return response;
+                });
     }
 
     private DietPlan parseDietPlan(String aiResponse) {

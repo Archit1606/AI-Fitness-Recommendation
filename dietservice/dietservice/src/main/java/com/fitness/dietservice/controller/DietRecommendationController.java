@@ -33,4 +33,12 @@ public class DietRecommendationController {
             @PathVariable String userId) {
         return ResponseEntity.ok(dietRecommendationService.getUserRecommendations(userId));
     }
+
+    @GetMapping("/user/{userId}/latest")
+    public ResponseEntity<DietRecommendationResponse> getLatestRecommendation(
+            @PathVariable String userId) {
+        return dietRecommendationService.getLatestRecommendation(userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
